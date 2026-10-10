@@ -10,7 +10,7 @@ import (
 
 func TestHealthz(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/healthz", nil)
 	rec := httptest.NewRecorder()
 	newRouter().ServeHTTP(rec, req)
 	if rec.Code != http.StatusNoContent {

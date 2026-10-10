@@ -15,3 +15,16 @@ linters:
     - errorlint
     - noctx
     - bodyclose
+    - forbidigo
+
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: '^os\.(Getenv|LookupEnv|Environ)$'
+          msg: only cmd/ and the config package read the environment; other code takes loaded config
+
+  exclusions:
+    rules:
+      - path: '^(cmd/|internal/config/)|_test\.go$'
+        linters:
+          - forbidigo
