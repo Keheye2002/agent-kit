@@ -1,6 +1,6 @@
-# my-skills
+# agent-kit
 
-跨 Agent 的 skill 集合。同一份 SKILL.md 在 Cursor、Codex CLI、Claude Code 以及任何遵循 [Agent Skills](https://github.com/anthropics/skills) 约定的 Agent 中都能被识别。
+个人的 Agent 工具箱：跨 Agent 的 skill 集合，加上把编码规范带进新项目的启动模板。同一份 SKILL.md 在 Cursor、Codex CLI、Claude Code 以及任何遵循 [Agent Skills](https://github.com/anthropics/skills) 约定的 Agent 中都能被识别。
 
 ## Skills
 
@@ -84,10 +84,10 @@
 把下面这段 prompt 丢给目标 Agent（Claude Code / Cursor / Codex CLI 等），它会把仓库里所有 skill 都软链到自己的 skills 目录：
 
 ```
-Install the my-skills collection for me:
+Install the skills from agent-kit for me:
 
-1. Clone https://github.com/b1ngsha/skills (with --recurse-submodules)
-   to a stable local path like ~/Documents/code/my-skills.
+1. Clone https://github.com/b1ngsha/agent-kit (with --recurse-submodules)
+   to a stable local path like ~/Documents/code/agent-kit.
 2. Symlink every SKILL.md under `<repo>/*/` and `<repo>/vendor/*/` (any depth)
    into your user-level skills dir (e.g. `~/.claude/skills/` for Claude Code).
    Respect `vendor/.allowlists/<submodule>` whitelists when present.
@@ -102,8 +102,8 @@ Install the my-skills collection for me:
 不想让 Agent 代劳、或者要批量装到全部 Agent 时，用脚本：
 
 ```bash
-git clone --recurse-submodules https://github.com/b1ngsha/skills.git ~/Documents/code/my-skills
-cd ~/Documents/code/my-skills
+git clone --recurse-submodules https://github.com/b1ngsha/agent-kit.git ~/Documents/code/agent-kit
+cd ~/Documents/code/agent-kit
 ./install.sh              # 更新仓库 + vendor 子模块，然后（重）链接（幂等）
 ./install.sh link         # 只重链接，不联网
 ./install.sh dry-run      # 预览变更

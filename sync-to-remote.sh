@@ -12,7 +12,7 @@
 #
 # Config (first found wins for defaults):
 #   ./sync-remote.conf
-#   ~/.config/skills-sync/sync-remote.conf
+#   ~/.config/agent-kit/sync-remote.conf
 #
 # Config format:
 #   REMOTE=user@192.168.101.71    # default target
@@ -21,7 +21,7 @@
 #   host=user@192.168.101.71
 #
 # Syncs:
-#   1. This skills repo          -> ~/Documents/code/skills
+#   1. This repo                 -> ~/Documents/code/agent-kit
 #   2. ~/.cursor/skills-cursor   -> ~/.cursor/skills-cursor
 #   3. Extra agent skills        -> ~/.agents/skills/
 #   4. Extra codex skills        -> ~/.codex/skills/
@@ -49,7 +49,7 @@ TARGET (first match wins):
   profile-name       named profile from sync-remote.conf
 
 Options:
-  -c, --config PATH  Config file (default: ./sync-remote.conf or ~/.config/skills-sync/sync-remote.conf)
+  -c, --config PATH  Config file (default: ./sync-remote.conf or ~/.config/agent-kit/sync-remote.conf)
   -l, --list         List configured profiles and exit
   -h, --help         Show this help
 
@@ -116,8 +116,8 @@ resolve_config_files() {
     CONFIG_FILES+=("$SYNC_CONFIG")
   elif [ -f "$REPO_DIR/sync-remote.conf" ]; then
     CONFIG_FILES+=("$REPO_DIR/sync-remote.conf")
-  elif [ -f "$HOME/.config/skills-sync/sync-remote.conf" ]; then
-    CONFIG_FILES+=("$HOME/.config/skills-sync/sync-remote.conf")
+  elif [ -f "$HOME/.config/agent-kit/sync-remote.conf" ]; then
+    CONFIG_FILES+=("$HOME/.config/agent-kit/sync-remote.conf")
   fi
 }
 
@@ -319,8 +319,8 @@ echo
 echo "==> [1/5] Ensuring remote directories..."
 ssh_cmd "mkdir -p ~/Documents/code ~/.cursor ~/.agents/skills ~/.codex/skills"
 
-echo "==> [2/5] Syncing skills repo..."
-rsync_to "$REPO_DIR/" "~/Documents/code/skills/"
+echo "==> [2/5] Syncing agent-kit repo..."
+rsync_to "$REPO_DIR/" "~/Documents/code/agent-kit/"
 
 echo "==> [3/5] Syncing ~/.cursor/skills-cursor..."
 if [ -d "$HOME/.cursor/skills-cursor" ]; then
@@ -346,7 +346,7 @@ for skill in xsparkai-design-system-review; do
 done
 
 echo "==> [5/5] Running install.sh on remote..."
-ssh_cmd "cd ~/Documents/code/skills && chmod +x install.sh && ./install.sh && echo && echo 'cursor/skills:' && ls -1 ~/.cursor/skills/ && echo && echo 'skills-cursor:' && ls -1 ~/.cursor/skills-cursor/"
+ssh_cmd "cd ~/Documents/code/agent-kit && chmod +x install.sh && ./install.sh && echo && echo 'cursor/skills:' && ls -1 ~/.cursor/skills/ && echo && echo 'skills-cursor:' && ls -1 ~/.cursor/skills-cursor/"
 
 echo
 echo "==> Done! Skills synced to $REMOTE"

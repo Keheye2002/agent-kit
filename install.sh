@@ -20,7 +20,7 @@
 # Set SKIP_UPDATE=1 to skip the network step even inside a clone.
 #
 # Remote one-liner (after pushing to GitHub):
-#   curl -fsSL https://raw.githubusercontent.com/b1ngsha/skills/master/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/b1ngsha/agent-kit/master/install.sh | bash
 
 set -euo pipefail
 

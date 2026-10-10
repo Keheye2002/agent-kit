@@ -1,4 +1,4 @@
-# Skills kit
+# Agent kit
 
 The personal kit of agent skills, and the coding standards a new project starts with.
 
