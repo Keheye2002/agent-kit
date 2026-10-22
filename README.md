@@ -25,7 +25,7 @@ cd ~/Documents/code/agent-kit
 
 安装器使用已有的 Agent 配置目录，跳过同名真实文件或目录。由 `npx skills` 管理的副本继续保留，其余按仓库来源建立软链。详细行为见下方[安装与更新](#安装与更新)。
 
-然后在支持 skill 调用的 Agent 中按任务选择，例如用 `/think` 推敲方案，完成实现后用 `/check` 自检。这些步骤由你手动切换。
+然后在支持 skill 调用的 Agent 中按任务选择可用 skill，并按需要手动切换。
 
 新项目则走另一条入口：
 
@@ -42,29 +42,15 @@ Gin 需要 Go；React 需要 pnpm，模板脚本也会使用 Python 3。脚手�
 
 | 你在做什么 | 入口 |
 | --- | --- |
-| 推敲需求与方案 | [think](vendor/Waza/plugins/waza/skills/think/) |
-| 交付前审查代码 | [check](vendor/Waza/plugins/waza/skills/check/) |
-| 排查报错和异常 | [hunt](vendor/Waza/plugins/waza/skills/hunt/) |
-| 设计页面与组件 | [ui](vendor/Waza/plugins/waza/skills/ui/) |
-| 阅读、研究、写作 | [read](vendor/Waza/plugins/waza/skills/read/) · [learn](vendor/Waza/plugins/waza/skills/learn/) · [write](vendor/Waza/plugins/waza/skills/write/) |
 | 制作 PDF、简历与幻灯片 | [kami](vendor/kami/plugins/kami/skills/kami/) |
 
 ### 自有 skills
 
 - **[find-simplifications](skills/find-simplifications/)**：扫描死代码、重复和过度设计，提出可落地的简化方案。
-- **[my-doc-style](skills/my-doc-style/)**：按个人写作习惯编写中文 README、测试指引、操作手册和 wiki。
 - **[release-tag](skills/release-tag/)**：分析 diff、选择版本、生成 changelog，并交互式完成 tag 与推送。
 
 <details>
-<summary>查看 Waza 与 Kami 的使用说明</summary>
-
-[Waza](vendor/Waza/) 围绕工程习惯提供独立 skills。除上表入口外，[health](vendor/Waza/plugins/waza/skills/health/) 用于排查 Agent 规则、hook 和 MCP 配置问题。每个 skill 有明确触发场景，用户决定何时调用，下面是手动组合示例：
-
-```text
-/think → 实施 → /check → 合并
-/read → /learn → /write
-/hunt → 修复 → /check
-```
+<summary>查看 Kami 的使用说明</summary>
 
 [Kami](vendor/kami/) 为简历、一页纸、白皮书、信件、作品集、幻灯片、研报和更新日志提供「暖米色 + 墨蓝」排版。可用「做 PDF」「排版」「简历」「PPT」等短语触发。
 
@@ -79,20 +65,15 @@ Gin 需要 Go；React 需要 pnpm，模板脚本也会使用 Python 3。脚手�
 
 | 来源 | 收录方向 | 上游 |
 | --- | --- | --- |
-| [Waza](vendor/Waza/) | 方案、界面、审查、排错、阅读与写作 | [tw93/Waza](https://github.com/tw93/Waza) |
 | [kami](vendor/kami/) | 文档排版 | [tw93/kami](https://github.com/tw93/kami) |
-| [mattpocock-skills](vendor/mattpocock-skills/) | code-review、tdd、research、prototype、domain-modeling 等 | [mattpocock/skills](https://github.com/mattpocock/skills) |
+| [mattpocock-skills](vendor/mattpocock-skills/) | 全量 skill set | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | [anthropics-skills](vendor/anthropics-skills/) | frontend-design | [anthropics/skills](https://github.com/anthropics/skills) |
-| [yutto-dev-yutto](vendor/yutto-dev-yutto/) | bilibili-video-download | [yutto-dev/yutto](https://github.com/yutto-dev/yutto) |
-| [humanizer-zh](vendor/humanizer-zh/) | humanizer-zh | [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh) |
 | [larksuite-meegle-cli](vendor/larksuite-meegle-cli/) | meegle | [larksuite/meegle-cli](https://github.com/larksuite/meegle-cli) |
 | [larksuite-cli](vendor/larksuite-cli/) | 白名单内的 lark-* skills | [larksuite/cli](https://github.com/larksuite/cli) |
 | [vercel-labs-skills](vendor/vercel-labs-skills/) | find-skills | [vercel-labs/skills](https://github.com/vercel-labs/skills) |
 | [brianlovin-claude-config](vendor/brianlovin-claude-config/) | simplify | [brianlovin/claude-config](https://github.com/brianlovin/claude-config) |
 | [humanlayer-skills](vendor/humanlayer-skills/) | show-me | [humanlayer/skills](https://github.com/humanlayer/skills) |
 | [cursor-plugins](vendor/cursor-plugins/) | thermo-nuclear-code-quality-review | [cursor/plugins](https://github.com/cursor/plugins) |
-| [yetone-kill-ai-slop](vendor/yetone-kill-ai-slop/) | kill-ai-slop | [yetone/kill-ai-slop](https://github.com/yetone/kill-ai-slop) |
-| [native-feel-skill](vendor/native-feel-skill/) | 单 skill，全量收录 | — |
 
 </details>
 
@@ -129,7 +110,7 @@ my-project/
 
 提交检查包含基础文件检查、格式与 lint，以及手写文本文件的 **5000 token 估算上限**（按字节数 ÷ 4）；React 还会运行类型检查和测试。安装 [pre-commit](https://pre-commit.com/) 及对应栈的检查工具后，在生成项目里执行 `make setup-hooks`（Gin）或 `pnpm setup-hooks`（React）启用 hooks。
 
-模板仅收录从 x-data 提炼的通用规范，背景见 [ADR](docs/adr/)。已有目标目录会被拒绝覆盖，Go 模块路径使用目标目录名。
+模板仅收录从 x-data 提炼的通用规范，不复制原项目的业务架构。已有目标目录会被拒绝覆盖，Go 模块路径使用目标目录名。
 
 ## 维护与扩展
 
@@ -149,7 +130,7 @@ my-project/
 
 安装器处理 `~/.agents/skills/`、`~/.claude/skills/`、`~/.cursor/skills/` 和 `~/.codex/skills/`，仅在对应 Agent 的父目录已存在时创建目标目录。
 
-- 自有 skills 优先于同名 vendor skills；vendor 按 allowlist 筛选。
+- 自有 skills 优先于同名 vendor skills；有 allowlist 的 vendor 按名单筛选，没有 allowlist 的 vendor 全量收录。
 - `npx skills` 锁文件中记录的副本继续由 npx 管理，其他 Agent 优先链接到 `~/.agents/skills/<name>`。
 - 未由 npx 管理的 skills 链接到本仓库源文件；更新这些文件后，软链指向的内容随之更新。
 - 同名真实目录或文件会跳过。卸载只移除脚本识别的软链。
@@ -187,15 +168,12 @@ agent-kit/
 ├── vendor/                    # 第三方 submodules 与白名单
 ├── stacks/                    # Gin、React 模板和工程规范
 ├── assets/readme/             # 首页视觉素材
-├── scripts/sync-to-remote.sh   # 远程同步
-├── docs/adr/                  # 设计决策
+├── scripts/                   # 维护脚本
 ├── install.sh                 # 安装入口
 └── new.sh                     # 新建项目入口
 ```
 
 新增自有 skill 放在 `skills/<name>/SKILL.md`，包含 YAML frontmatter（`name`、`description`）与正文；按需添加 `references/`。参考 [find-simplifications](skills/find-simplifications/SKILL.md)，然后运行 `./install.sh link`。
-
-远程同步使用 `./scripts/sync-to-remote.sh`，配置示例为 [sync-remote.conf.example](sync-remote.conf.example)，实际配置仍放在仓库根目录的 `sync-remote.conf`。
 
 </details>
 

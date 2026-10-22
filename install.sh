@@ -16,7 +16,7 @@
 #
 # The git pull / submodule step only runs when this script lives in a real git
 # checkout (a local clone). It is skipped automatically for remote one-liners
-# and for rsync'd copies pushed by scripts/sync-to-remote.sh (they contain no .git).
+# and other copies that contain no .git.
 # Set SKIP_UPDATE=1 to skip the network step even inside a clone.
 #
 # Remote one-liner (after pushing to GitHub):
@@ -90,7 +90,7 @@ update_repo() {
     UPDATE_FAILED=1
   fi
 
-  # 2. Refresh vendor submodules (Waza, kami, native-feel-skill, …)
+  # 2. Refresh vendor submodules (kami and other curated sources)
   #    to their upstream tips. This stages the new gitlink pointers in the
   #    superproject but does not commit them.
   if ! git -C "$git_root" submodule update --recursive --remote 2>&1 | sed 's/^/    /'; then
