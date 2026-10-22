@@ -1,4 +1,7 @@
-.PHONY: fmt lint test run
+.PHONY: setup-hooks fmt lint test run
+
+setup-hooks:
+	pre-commit install --install-hooks
 
 APP := $(notdir $(abspath .))
 

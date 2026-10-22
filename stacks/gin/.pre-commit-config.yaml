@@ -1,0 +1,37 @@
+minimum_pre_commit_version: "3.2.0"
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      - id: file-token-limit
+        name: staged files stay under 5000 tokens
+        language: system
+        entry: scripts/check-file-tokens.sh
+        types: [text]
+        exclude: (^|/)(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|go\.sum)$
+
+      - id: gofmt
+        name: gofmt
+        language: system
+        entry: bash -c 'unformatted="$(gofmt -l "$@")"; if [ -n "$unformatted" ]; then printf "Run gofmt on:\n%s\n" "$unformatted"; exit 1; fi' --
+        types: [go]
+
+      - id: golangci-lint
+        name: golangci-lint
+        language: system
+        entry: golangci-lint run ./...
+        types: [go]
+        pass_filenames: false
+        require_serial: true

@@ -53,11 +53,19 @@ copy_gin_overlay() {
 copy_react_overlay() {
   cp "$ROOT/stacks/react/AGENTS.md" "$ROOT/stacks/react/CODING_STANDARDS.md" "$dest/"
   mkdir -p "$dest/docs/standards" "$dest/src/routes" "$dest/src/test"
-  cp "$ROOT/stacks/react/docs/standards/web-testing.md" "$dest/docs/standards/"
-  cp "$ROOT/stacks/react/.oxlintrc.json" "$ROOT/stacks/react/.oxfmtrc.json" "$ROOT/stacks/react/vite.config.ts" "$dest/"
+  cp "$ROOT/stacks/react/docs/standards/"*.md "$dest/docs/standards/"
+  cp "$ROOT/stacks/react/.oxlintrc.json" "$ROOT/stacks/react/.oxfmtrc.json" "$ROOT/stacks/react/vite.config.ts" "$ROOT/stacks/react/.pre-commit-config.yaml" "$dest/"
+  mkdir -p "$dest/scripts"
+  cp "$ROOT/stacks/react/scripts/check-file-tokens.sh" "$dest/scripts/"
   cp "$ROOT/stacks/react/src/main.tsx" "$dest/src/main.tsx"
   cp "$ROOT/stacks/react/src/routes/__root.tsx" "$ROOT/stacks/react/src/routes/index.tsx" "$dest/src/routes/"
   cp "$ROOT/stacks/react/src/test/setup.ts" "$dest/src/test/"
+  python3 - "$dest/index.html" <<'PY'
+import re, sys
+from pathlib import Path
+path = Path(sys.argv[1])
+path.write_text(re.sub(r"\s*<title>.*?</title>", "", path.read_text(), flags=re.DOTALL))
+PY
   python3 - "$dest/package.json" <<'PY'
 import json, sys
 path = sys.argv[1]
@@ -68,6 +76,7 @@ scripts["test"] = "vitest run"
 scripts["lint"] = "oxlint --type-aware ."
 scripts["format"] = "oxfmt --write ."
 scripts["format:check"] = "oxfmt --check ."
+scripts["setup-hooks"] = "pre-commit install --install-hooks"
 with open(path, "w") as f:
     json.dump(pkg, f, indent=2)
     f.write("\n")
@@ -103,12 +112,13 @@ command -v pnpm >/dev/null 2>&1 || { echo "pnpm is required" >&2; exit 1; }
   pnpm add @tanstack/react-router @tanstack/react-query
   pnpm add -D @tanstack/router-plugin @tanstack/router-cli vitest jsdom \
     @testing-library/react @testing-library/jest-dom @testing-library/user-event \
-    oxlint oxfmt
+    oxlint oxlint-tsgolint oxfmt
 )
 copy_react_overlay
 (
   cd "$dest"
   pnpm exec tsr generate
+  pnpm format
   pnpm test
 )
 echo "created $dest"

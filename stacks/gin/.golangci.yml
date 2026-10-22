@@ -16,8 +16,13 @@ linters:
     - noctx
     - bodyclose
     - forbidigo
+    - nolintlint
 
   settings:
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
     forbidigo:
       forbid:
         - pattern: '^os\.(Getenv|LookupEnv|Environ)$'
@@ -28,3 +33,4 @@ linters:
       - path: '^(cmd/|internal/config/)|_test\.go$'
         linters:
           - forbidigo
+        text: 'os\.(Getenv|LookupEnv|Environ)'

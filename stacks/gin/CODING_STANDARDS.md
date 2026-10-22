@@ -1,12 +1,14 @@
 # Coding Standards
 
 How this service is written where no linter decides. Authors apply every rule
-while writing; a review applies every rule to the diff. Each rule carries a
-tag:
+while writing; a review applies every rule to the diff. A rule is Hard unless under a Judgement label:
 
-- **Hard**: a breach is a violation. Cite this file and the section.
+- **Hard**: a breach is a violation. Cite the file and section that state the rule.
 - **Judgement**: report it as "possible …" with the reason, and let the author
   decide.
+
+A **Judgement** label covers the rest of its section. A **Smell baseline
+override** names the review smell the section replaces; it adds no rule.
 
 ## Owned elsewhere
 
@@ -15,52 +17,89 @@ These documents own their topic. Apply them as written.
 | Topic | Owner |
 | --- | --- |
 | Go tests | `docs/standards/go-testing.md` |
+| Schema and migrations, when present | `docs/standards/database.md` |
+| OpenAPI contracts, when present | `docs/standards/api-contract.md` |
 
 Formatting (`gofmt`) and every rule enabled in `.golangci.yml` belong to the
 tools. `make fmt`, `make lint`, and `make test` run them.
+Review accepts their output as final. A rule that becomes mechanically
+checkable moves into a tool and leaves its document.
+
+**Hard.** A suppression (`//nolint:<linter> // <reason>` or
+`oxlint-disable-next-line <rule> -- <reason>`) states why the finding is false
+at that line. A suppression, exclusion, or test-only branch that silences a
+true finding so CI passes is a violation; fix the code instead. The one
+exception is a new rule's baseline: the commit that enables the rule lists,
+by path, the files it already breaks, and later commits only delete entries.
+
+Where every source is silent, match the surrounding code. A change made only
+to meet a standard keeps behavior identical and lands in its own commit,
+apart from feature or fix work. Work used by only one CI job stays in that
+job's script; a separate program earns its place when people also run it.
 
 ## Placement and extraction
 
-The leading word is **colocate**: code sits beside its only caller until a
-second owner needs it.
+Code **colocates**: an expression stays at its call site until the third
+production occurrence of the same decision (the Rule of Three) shows which
+part the callers share, so each layer a reader traces pays for itself.
 
 **Hard.**
 
-- A helper starts unexported, in the file or package of its first caller. It
-  moves outward one step at a time (file, then package, then a shared
-  package) when a caller in the next scope needs it. A symbol moves together
-  with its tests.
-- A package is named for what it provides. Shared code joins a package with
-  that kind of name.
+- A helper starts unexported, in the file of its callers. It moves outward
+  one step at a time (file, then package, then a shared package) when a
+  caller in the next scope needs it. A symbol moves together with its tests.
+- A second file that needs a private helper's decision imports the moved
+  helper. Before adding a helper, search the tree for one that already
+  decides the same thing and call it. A copy under another name, a shorter
+  one, or one written inline at the call site is still a copy.
+- A package is named for what it provides. Shared code joins a package
+  with that kind of name.
 - One business rule (a validation, a state transition, a limit) has one
-  source. That source appears when a second caller needs the decision.
+  source: the helper born at the third production call site. A test drives
+  one of those sites.
 - A repeated value (a literal, a lookup table, a key list) is one fact. The
-  second file that needs the same value names it.
-- A helper appears when a second caller needs the same decision. Until then
-  the expression stays at the call site. A name that only restates the
-  expression does not earn the helper.
-- When a reusable helper already exists, new code calls it. A hand-written
-  second version of the same rule breaks the one-source rule, even when it is
-  shorter.
+  second file that needs it names it: naming adds no parameter and no branch,
+  and two copies drift.
+- A value that several callers share (a fallback message, a default, a limit,
+  an error code) is held once: as a configured default where the API
+  supports it, otherwise as a named constant each caller passes.
+- A function, type, file, or test helper that only forwards to another,
+  adding no decision, is a **pass-through** and is inlined, however many
+  callers it has.
 
 **Judgement.**
 
-- A function whose body is as clear as its name stays at the call site even
-  after a second caller, until the name adds a decision the expression does
-  not show.
-- A **pass-through** function, type, file, or test helper forwards to another
-  without adding a decision. Inline it.
-- Look-alike code that encodes different rules stays duplicated until the
-  third occurrence that changes for the same reason. Two similar hunks are
-  not yet a pattern.
+- A name earns a helper, even after the third caller, only when it records a
+  decision the expression does not show and a constant cannot hold: a key
+  built from arguments, a lookup together with its absent case, a type the
+  expression would leave wide, or a module's private implementation. A
+  function whose body is as clear as its name stays at the call site.
+- Code that encodes a different rule stays at its own call site, however
+  much it resembles a sibling helper. A builder that one call site uses is
+  written at that call site.
 - An abstraction that has grown a boolean or mode parameter, or a branch only
-  one caller takes, is split back into each caller. Each caller keeps the
-  part it uses.
+  one caller takes, is the wrong abstraction. Inline it back into each
+  caller, delete what each caller does not use, then extract only what the
+  callers truly share.
 - A function whose parameter list keeps growing splits into simpler functions
   first. An options struct fits when most callers set several options.
 
 **Smell baseline override.** These rules replace the generic Duplicated Code
 smell: flag duplication only per the rules above.
+
+## Go files and interfaces
+
+**Hard.**
+
+- The consumer declares dependency interfaces. Implementations return concrete
+  types.
+- A generated database row type has one mapper in the package that owns
+  storage. Queries returning it call that mapper, so columns and UTC/null
+  normalization change in one place.
+
+**Judgement.** Files follow concepts or capabilities. New code joins the
+concept it serves; a file edited for unrelated capabilities, or one
+capability scattered across files, wants re-cutting along concepts.
 
 ## Construction
 
@@ -70,7 +109,9 @@ dependency it will ever call.
 **Hard.**
 
 - A dependency a method calls is a constructor argument, and the constructor
-  rejects it when it is missing. Request paths do not check for `nil`
+  rejects it when it is missing. A dependency used by only one process role
+  is assembled by that role, so other roles never build it or hold its
+  credentials. Request paths do not check for `nil`
   dependencies or answer "unavailable" for an unassembled one.
 - A capability is a method on the interface the constructor requires. Code
   does not type-assert a dependency at runtime to discover an optional
@@ -100,6 +141,9 @@ that change.
 **Judgement.** A list, table, or registry with one entry is a singleton
 dressed as a catalog. Write the single case directly and introduce the
 catalog with the second entry.
+
+**Judgement.** A mechanism outside the requested change waits for the
+change that needs it, even when the code calls it.
 
 **Smell baseline override.** These rules decide Speculative Generality.
 
@@ -143,6 +187,12 @@ type once, and code past the boundary trusts the type.
 - The value a boundary validates is the value it stores. When a field is
   trimmed or normalized for the check, the normalized value goes to the
   store.
+- A generated type that does not fit is fixed in its generator: a schema or
+  generator override, rather than a helper that converts between a generated
+  pointer and a value or copies a pointer it could pass on. Generated files
+  are committed and regenerated from their sources, never edited by hand.
+  Regenerate after merging base changes even when generated output merges
+  cleanly.
 
 **Judgement.** A check repeated past the boundary, on a value the type
 already guarantees, means the parse is missing or leaks.
@@ -162,10 +212,35 @@ caller is allowed to see.
   not own.
 - Uniqueness is decided by a unique constraint. The insert is the check, so
   concurrent writers cannot both pass it. The empty result of a conflict
-  insert becomes the already-exists outcome.
+  insert becomes the already-exists outcome when the caller must learn about
+  the repeat. Where the process rule is to skip it, zero rows is not an error
+  and no error value stands for it.
+- Many rows written in one transaction take one statement per chunk, rather
+  than one statement per row. With PostgreSQL, columns can travel as arrays
+  and `unnest` turns them back into rows. A row-at-a-time loop holds locks
+  while paying a round trip per row.
 - A write a client may retry is idempotent, keyed by a natural or
   client-supplied key. A repeat of the same request returns the existing
   result. A different request on the same key is a conflict.
+
+## Concurrency
+
+A check **holds until commit**: it either is the statement that writes, or
+locks what it read.
+
+**Hard.**
+
+- The guard on the row a statement writes goes in that statement:
+  `UPDATE … WHERE id = $1 AND scope_id = $2 AND status IN (…) RETURNING …`.
+  Zero rows is the miss, and the caller classifies it afterwards. Lock that
+  row `FOR UPDATE` first only when the transaction does other work with it
+  before the write.
+- A check inside a transaction on another row that another writer can
+  invalidate locks that row until commit: `FOR SHARE` to read it,
+  `FOR UPDATE` to change it, and the parent row when the row may not exist
+  yet. A plain `SELECT` lets the row change after the check passes.
+- Writers that lock the same rows lock them in one order, stated by the
+  deciding ADR or, without one, at the lock.
 
 ## Errors
 
@@ -224,6 +299,8 @@ Code inside the service returns errors and leaves logging to that edge.
 **Hard.**
 
 - A component that logs receives its logger from its constructor.
+- Request- and job-scoped log lines carry context correlation/trace fields,
+  so they join the operation's trace.
 - The message is a fixed phrase. Varying data goes into structured fields
   with `snake_case` keys.
 - An error field carries the error value.
@@ -267,21 +344,71 @@ Gin is the HTTP router.
 **Judgement.** A metric or log that records a request uses the route
 template, the pattern registered on the router, rather than the raw path.
 
-## Records
-
-The leading word is **same change**: a change that alters a behavior also
-edits every record that states it.
+## Names and comments
 
 **Hard.**
 
-- Records are `README.md` command and output contracts, ADRs, the glossary,
-  and the API contract, where the project has them. A diff that changes a
-  command, a table, a route's security, or an error code edits the record in
-  the same change.
-- A superseded sentence is rewritten or deleted. A "superseded by" banner
-  above a body that still states the old rule leaves two rules in force.
-- A record describes the tree as it is. A file layout or route table that
-  does not exist on disk is a second source of truth.
+- When the project has a glossary, identifiers, file names, error messages,
+  and log messages use its terms. A term on a glossary _Avoid_ line is a
+  violation.
+- An exported identifier reads well after its package or module name.
+- An ADR is cited by its filename or a Markdown link to that file, in
+  comments and documents alike. The filename names the decision and resolves
+  to one file.
 
-**Judgement.** A new document that restates rules another record already
-owns wants deleting in favor of a pointer to the owner.
+**Judgement.**
+
+- A comment states what the code cannot show: a constraint, a gotcha, the
+  reason for an odd choice, or the ADR filename that decided it.
+- Ticket and review identifiers belong in the commit and pull request, so a
+  comment stays true after the review closes.
+
+## Records
+
+A change that alters a behavior edits, in the **same change**, every accepted
+record that states it.
+
+**Hard.**
+
+- Records are architecture documents, ADRs, the glossary, README command and
+  output contracts, operations guides, and the API contract, where the
+  project has them. A diff that changes a command, a state-file schema, a
+  table, a route's security, or an error code edits the record in the same
+  change.
+- A superseded sentence is rewritten or deleted; in an ADR it may instead
+  stay in the past tense as the history of the decision. A "superseded by"
+  banner above a body that still states the old rule leaves two rules in force.
+- A record describes the tree as it is. A file layout, route table, or
+  migration number that does not exist on disk is a second source of truth;
+  change the code first, then the record.
+- A decision whose code lands in a later change is an ADR marked
+  `Status: Proposed.`, which the implementing change updates to
+  `Status: Accepted.`. Until that code merges, current architecture, specs,
+  and the ADRs it would replace keep describing the tree. The proposal's
+  Consequences lists the records the implementing change rewrites. A planned
+  module, table, or route stays out of current lists; its glossary term says
+  it is proposed.
+
+**Judgement.**
+
+- A new document that restates rules another record already owns wants
+  deleting in favor of a pointer to the owner.
+- Notes about how a change was made (a delivery log, a consensus summary, a
+  testing-architecture plan, a runbook that restates a command's flags)
+  belong in the pull request description. A document lands under `docs/`
+  only when a later reader needs it and the code cannot tell them.
+
+## Dependencies
+
+**Hard.**
+
+- A pull request that adds a runtime dependency explains why the project
+  cannot do without it and how it fares on the
+  [OpenSSF Concise Guide](https://best.openssf.org/Concise-Guide-for-Evaluating-Open-Source-Software)
+  questions: an existing component that already does the job, maintenance in
+  the last 12 months, a published audit or security record, an OSI license,
+  and the transitive dependencies it brings.
+- The lockfile changes in the same commit as the manifest.
+
+**Judgement.** Prefer a dependency with no transitive dependencies and an
+independent audit over a larger one that does more.

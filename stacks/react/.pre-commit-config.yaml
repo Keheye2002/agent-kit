@@ -1,0 +1,51 @@
+minimum_pre_commit_version: "3.2.0"
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      - id: file-token-limit
+        name: staged files stay under 5000 tokens
+        language: system
+        entry: scripts/check-file-tokens.sh
+        types: [text]
+        exclude: (^|/)(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|go\.sum|src/routeTree\.gen\.ts)$
+
+      - id: oxfmt
+        name: oxfmt
+        language: system
+        entry: pnpm exec oxfmt --write
+        files: \.(cjs|mjs|js|jsx|ts|tsx|json|css|md|ya?ml|html)$
+        exclude: ^src/routeTree\.gen\.ts$
+
+      - id: oxlint
+        name: oxlint
+        language: system
+        entry: pnpm exec oxlint --type-aware --fix
+        files: \.(cjs|mjs|js|jsx|ts|tsx)$
+        exclude: ^src/routeTree\.gen\.ts$
+
+      - id: typecheck
+        name: typecheck
+        language: system
+        entry: pnpm exec tsc -b
+        files: \.(cjs|mjs|js|jsx|ts|tsx|json)$
+        pass_filenames: false
+
+      - id: test
+        name: test
+        language: system
+        entry: pnpm test
+        files: .
+        pass_filenames: false

@@ -26,7 +26,9 @@
 | `./new.sh gin <dir>` | Gin HTTP 服务：`GET /healthz`、短的 golangci-lint 配置、`make fmt` / `lint` / `test` |
 | `./new.sh react <dir>` | 仓库根的 Vite + React + TanStack Router 应用，pnpm，oxlint / oxfmt |
 
-原文在 [`stacks/gin`](stacks/gin/) 和 [`stacks/react`](stacks/react/)。模块路径用目录名。已有目录会拒绝覆盖，也不会改已存在的仓库。
+原文在 [`stacks/gin`](stacks/gin/) 和 [`stacks/react`](stacks/react/)。规则从 x-data 提取可复用部分：Gin 附带 Go 测试、API 契约和数据库规范，React 附带代码、路由和测试规范，均随模板复制到 `docs/standards/`。x-data 的业务模块和产品导航留在原项目。
+
+模块路径用目录名。已有目录会拒绝覆盖，也不会改已存在的仓库。
 
 ### Waza · 工程习惯（vendor 子模块：[tw93/Waza](https://github.com/tw93/Waza)）
 
