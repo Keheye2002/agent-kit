@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">agent-kit — Skills for your agents. Standards for your projects.</title>
+  <desc id="desc">Two paths through the toolkit: skills and vendor collections are linked through install.sh to coding agents; Gin and React stacks are copied through new.sh into new projects.</desc>
+  <rect width="1200" height="640" rx="16" fill="#F6F8FA"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#17212B">
+    <text x="64" y="70" font-size="22" font-weight="600" letter-spacing="3" fill="#596675">THE DEVELOPER'S WORKING KIT</text>
+    <text x="60" y="190" font-size="112" font-weight="750" letter-spacing="-6">agent-kit<tspan fill="#147D73">/</tspan></text>
+    <text x="64" y="248" font-size="32">Skills for your agents. Standards for your projects.</text>
+    <path d="M64 292H1136" stroke="#D5DCE3" stroke-width="2"/>
+
+    <g id="skills-path">
+      <text x="64" y="344" font-size="20" font-weight="650" letter-spacing="2" fill="#147D73">01 / LINK</text>
+      <g font-family="ui-monospace, 'SFMono-Regular', Menlo, monospace" font-size="36">
+        <text x="64" y="407">skills/</text>
+        <text x="64" y="451" fill="#596675">vendor/</text>
+        <text x="458" y="426" fill="#147D73">install.sh</text>
+      </g>
+      <path d="M292 413H408m-12-12 12 12-12 12M706 413H822m-12-12 12 12-12 12" fill="none" stroke="#147D73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="862" y="426" font-size="44" font-weight="650">Agents</text>
+    </g>
+
+    <g id="project-path">
+      <text x="64" y="510" font-size="20" font-weight="650" letter-spacing="2" fill="#365EC9">02 / COPY</text>
+      <g font-family="ui-monospace, 'SFMono-Regular', Menlo, monospace" font-size="36">
+        <text x="64" y="572">stacks/</text>
+        <text x="458" y="572" fill="#365EC9">new.sh</text>
+      </g>
+      <path d="M292 559H408m-12-12 12 12-12 12M706 559H822m-12-12 12 12-12 12" fill="none" stroke="#365EC9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="862" y="572" font-size="44" font-weight="650">Projects</text>
+    </g>
+  </g>
+</svg>

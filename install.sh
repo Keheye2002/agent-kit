@@ -16,7 +16,7 @@
 #
 # The git pull / submodule step only runs when this script lives in a real git
 # checkout (a local clone). It is skipped automatically for remote one-liners
-# and for rsync'd copies pushed by sync-to-remote.sh (they contain no .git).
+# and for rsync'd copies pushed by scripts/sync-to-remote.sh (they contain no .git).
 # Set SKIP_UPDATE=1 to skip the network step even inside a clone.
 #
 # Remote one-liner (after pushing to GitHub):
@@ -112,7 +112,7 @@ fi
 
 # ---------------------------------------------------------------------------
 # Discover skills:
-#   1. authored:  <repo>/<skill>/SKILL.md
+#   1. authored:  <repo>/skills/<skill>/SKILL.md
 #   2. vendored:  any SKILL.md under <repo>/vendor/<sub>/... (submodules).
 #      A per-vendor allowlist file <repo>/vendor/.allowlists/<sub> may restrict
 #      which skill names get linked (one per line; lines of the form
@@ -138,7 +138,7 @@ add_skill() {  # $1 = dir containing SKILL.md, $2 = link name
 while IFS= read -r file; do
   dir="$(dirname "$file")"
   add_skill "$dir" "$(basename "$dir")"
-done < <(find "$REPO_DIR" -mindepth 2 -maxdepth 2 -name SKILL.md -not -path '*/.git/*' 2>/dev/null | LC_ALL=C sort)
+done < <(find "$REPO_DIR/skills" -mindepth 2 -maxdepth 2 -name SKILL.md -not -path '*/.git/*' 2>/dev/null | LC_ALL=C sort)
 
 for sub in "$REPO_DIR"/vendor/*/; do
   [ -d "$sub" ] || continue
