@@ -2,16 +2,16 @@
 # Sync local skills to a remote machine.
 #
 # Usage:
-#   ./sync-to-remote.sh                          # use REMOTE env or sync-remote.conf
-#   ./sync-to-remote.sh user@192.168.101.71       # explicit host
-#   ./sync-to-remote.sh 192.168.101.71           # host only (uses SSH_USER or $USER)
-#   ./sync-to-remote.sh lab                        # named profile from sync-remote.conf
-#   REMOTE=user@host ./sync-to-remote.sh         # env var
-#   SSH_PASSWORD='xxx' ./sync-to-remote.sh host  # non-interactive password
-#   SSH_KEY=~/.ssh/id_ed25519 ./sync-to-remote.sh host
+#   ./scripts/sync-to-remote.sh                          # use REMOTE env or sync-remote.conf
+#   ./scripts/sync-to-remote.sh user@192.168.101.71       # explicit host
+#   ./scripts/sync-to-remote.sh 192.168.101.71           # host only (uses SSH_USER or $USER)
+#   ./scripts/sync-to-remote.sh lab                        # named profile from sync-remote.conf
+#   REMOTE=user@host ./scripts/sync-to-remote.sh         # env var
+#   SSH_PASSWORD='xxx' ./scripts/sync-to-remote.sh host  # non-interactive password
+#   SSH_KEY=~/.ssh/id_ed25519 ./scripts/sync-to-remote.sh host
 #
 # Config (first found wins for defaults):
-#   ./sync-remote.conf
+#   <repo>/sync-remote.conf
 #   ~/.config/agent-kit/sync-remote.conf
 #
 # Config format:
@@ -29,7 +29,7 @@
 
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RSYNC_OPTS=(-avz --delete --exclude '.git/' --exclude '.DS_Store')
 CONFIG_DEFAULT_USER="${SSH_USER:-${USER:-}}"
 CONFIG_REMOTE=""
@@ -49,7 +49,7 @@ TARGET (first match wins):
   profile-name       named profile from sync-remote.conf
 
 Options:
-  -c, --config PATH  Config file (default: ./sync-remote.conf or ~/.config/agent-kit/sync-remote.conf)
+  -c, --config PATH  Config file (default: <repo>/sync-remote.conf or ~/.config/agent-kit/sync-remote.conf)
   -l, --list         List configured profiles and exit
   -h, --help         Show this help
 
