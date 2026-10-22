@@ -7,9 +7,6 @@
 [submodule "vendor/anthropics-skills"]
 	path = vendor/anthropics-skills
 	url = https://github.com/anthropics/skills.git
-[submodule "vendor/humanizer-zh"]
-	path = vendor/humanizer-zh
-	url = https://github.com/op7418/Humanizer-zh.git
 [submodule "vendor/larksuite-meegle-cli"]
 	path = vendor/larksuite-meegle-cli
 	url = https://github.com/larksuite/meegle-cli.git

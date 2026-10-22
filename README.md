@@ -66,9 +66,8 @@ Gin 需要 Go；React 需要 pnpm，模板脚本也会使用 Python 3。脚手�
 | 来源 | 收录方向 | 上游 |
 | --- | --- | --- |
 | [kami](vendor/kami/) | 文档排版 | [tw93/kami](https://github.com/tw93/kami) |
-| [mattpocock-skills](vendor/mattpocock-skills/) | code-review、tdd、research、prototype、domain-modeling 等 | [mattpocock/skills](https://github.com/mattpocock/skills) |
+| [mattpocock-skills](vendor/mattpocock-skills/) | 全量 skill set | [mattpocock/skills](https://github.com/mattpocock/skills) |
 | [anthropics-skills](vendor/anthropics-skills/) | frontend-design | [anthropics/skills](https://github.com/anthropics/skills) |
-| [humanizer-zh](vendor/humanizer-zh/) | humanizer-zh | [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh) |
 | [larksuite-meegle-cli](vendor/larksuite-meegle-cli/) | meegle | [larksuite/meegle-cli](https://github.com/larksuite/meegle-cli) |
 | [larksuite-cli](vendor/larksuite-cli/) | 白名单内的 lark-* skills | [larksuite/cli](https://github.com/larksuite/cli) |
 | [vercel-labs-skills](vendor/vercel-labs-skills/) | find-skills | [vercel-labs/skills](https://github.com/vercel-labs/skills) |
@@ -131,7 +130,7 @@ my-project/
 
 安装器处理 `~/.agents/skills/`、`~/.claude/skills/`、`~/.cursor/skills/` 和 `~/.codex/skills/`，仅在对应 Agent 的父目录已存在时创建目标目录。
 
-- 自有 skills 优先于同名 vendor skills；vendor 按 allowlist 筛选。
+- 自有 skills 优先于同名 vendor skills；有 allowlist 的 vendor 按名单筛选，没有 allowlist 的 vendor 全量收录。
 - `npx skills` 锁文件中记录的副本继续由 npx 管理，其他 Agent 优先链接到 `~/.agents/skills/<name>`。
 - 未由 npx 管理的 skills 链接到本仓库源文件；更新这些文件后，软链指向的内容随之更新。
 - 同名真实目录或文件会跳过。卸载只移除脚本识别的软链。
